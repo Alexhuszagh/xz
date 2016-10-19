@@ -52,7 +52,13 @@ set_target_properties(Xz
 # LINKING
 # -------
 
-target_link_libraries(Xz LibLzma)
+target_link_libraries(Xz
+    LibLzma
+)
+
+if(CMAKE_USE_PTHREADS_INIT)
+    target_link_libraries(Xz pthread)
+endif()
 
 # FLAGS
 # -----
