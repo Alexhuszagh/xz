@@ -38,16 +38,24 @@ set_target_properties(LzmaDec
     PROPERTIES OUTPUT_NAME lzmadec
 )
 
+# LINKING
+# -------
+
+target_link_libraries(XzDec LibLzma)
+target_link_libraries(LzmaDec LibLzma)
+
 # FLAGS
 # -----
 
 target_compile_definitions(XzDec PUBLIC -DTUKLIB_GETTEXT=0)
 target_compile_definitions(LzmaDec PUBLIC -DLZMADEC)
 
+if(BUILD_STATIC)
+    add_definitions(-DLZMA_API_STATIC)
+endif()
+
 #if COND_GNULIB
 #xzdec_LDADD += $(top_builddir)/lib/libgnu.a
 #endif
 # xzdec_LDADD += $(LTLIBINTL)
 
-# TODO: lzmdec only
-#add_definitions()

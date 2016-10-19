@@ -5,6 +5,6 @@
 # ---------
 
 add_subdirectory(liblzma)
-#add_subdirectory(xzdec)
-
-# TODO: check arguments and add subdirectories as needed
+if(BUILD_XZ)
+    add_subdirectory(xzdec)
+endif()

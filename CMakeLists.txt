@@ -12,6 +12,16 @@ set(${PROJECT}_VERSION_MAJOR 5)
 set(${PROJECT}_VERSION_MINOR 3)
 set(${PROJECT}_VERSION_PATCH 0)
 
+add_definitions(
+    -DPACKAGE_NAME="XZ Utils"
+    -DPACKAGE_STRING="XZ Utils 5.3.0alpha"
+    -DPACKAGE_TARNAME="xz"
+    -DPACKAGE_VERSION="5.3.0alpha"
+    -DPACKAGE_URL="http://tukaani.org/xz/"
+    -DPACKAGE_BUGREPORT="lasse.collin@tukaani.org"
+)
+#PACKAGE_URL
+
 # ARGUMENTS
 # ---------
 
@@ -28,6 +38,10 @@ option(ENABLE_SCRIPTS "Build LZMA xzdiff, xzgrep, xzmore and xzless" ON)
 option(ENABLE_SMALL "Build small version of LZMA" OFF)
 option(ENABLE_SYMBOL_VERSIONS "Build LZMA with version symbols" ON)
 option(ENABLE_THREADS "Build LZMA with threading support" ON)
+
+if(ENABLE_ASSSEMBLER)
+    enable_language(ASM)
+endif()
 
 # CHECKS
 set(ENABLE_CRC32 ON)

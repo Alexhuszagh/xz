@@ -24,7 +24,6 @@ include_directories(
 # SOURCES
 # -------
 
-# Might need sysdefs?
 set(LZMA_SOURCES
     ../common/tuklib_physmem.c
     check/check.c
@@ -47,6 +46,40 @@ if(ENABLE_THREADS)
         common/outqueue.c
         common/stream_encoder_mt.c
     )
+endif()
+
+# CHECKS
+
+if(ENABLE_CRC32)
+    if(ENABLE_SMALL)
+        list(APPEND LZMA_SOURCES check/crc32_small.c)
+    else()
+        list(APPEND LZMA_SOURCES check/crc32_table.c)
+    endif()
+
+    if(ENABLE_ASSSEMBLER AND ARCH EQUAL 32)
+        list(APPEND LZMA_SOURCES check/crc32_x86.S)
+    else()
+        list(APPEND LZMA_SOURCES check/crc32_fast.c)
+    endif()
+endif()
+
+if(ENABLE_CRC64)
+    if(ENABLE_SMALL)
+        list(APPEND LZMA_SOURCES check/crc64_small.c)
+    else()
+        list(APPEND LZMA_SOURCES check/crc64_table.c)
+    endif()
+
+    if(ENABLE_ASSSEMBLER AND ARCH EQUAL 32)
+        list(APPEND LZMA_SOURCES check/crc64_x86.S)
+    else()
+        list(APPEND LZMA_SOURCES check/crc64_fast.c)
+    endif()
+endif()
+
+if(ENABLE_SHA256 AND EXTERNAL_SHA256)
+    list(APPEND LZMA_SOURCES check/sha256.c)
 endif()
 
 # FILTERS
@@ -154,44 +187,6 @@ endif()
 
 if(ENABLE_SPARC)
     list(APPEND LZMA_SOURCES simple/sparc.c)
-endif()
-
-# CHECKS
-
-if(ENABLE_CRC32)
-    if(ENABLE_SMALL)
-        list(APPEND LZMA_SOURCES check/crc32_small.c)
-    else()
-        list(APPEND LZMA_SOURCES
-            check/crc32_table.c
-        )
-    endif()
-
-    if(ENABLE_ASSSEMBLER)
-        list(APPEND LZMA_SOURCES check/crc32_x86.S)
-    else()
-        list(APPEND LZMA_SOURCES check/crc32_fast.c)
-    endif()
-endif()
-
-if(ENABLE_CRC64)
-    if(ENABLE_SMALL)
-        list(APPEND LZMA_SOURCES check/crc64_small.c)
-    else()
-        list(APPEND LZMA_SOURCES
-            check/crc64_table.c
-        )
-    endif()
-
-    if(ENABLE_ASSSEMBLER)
-        list(APPEND LZMA_SOURCES check/crc64_x86.S)
-    else()
-        list(APPEND LZMA_SOURCES check/crc64_fast.c)
-    endif()
-endif()
-
-if(ENABLE_SHA256 AND EXTERNAL_SHA256)
-    list(APPEND LZMA_SOURCES check/sha256.c)
 endif()
 
 # FLAGS
