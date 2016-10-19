@@ -341,7 +341,8 @@ endif()
 include(FindThreads)
 
 if(ENABLE_THREADS)
-    if(CMAKE_USE_PTHREADS_INIT)
+    if(CMAKE_USE_PTHREADS_INIT AND NOT WIN32)
+        # mingw-w64 is missing sigfillset
         add_definitions(-DMYTHREAD_POSIX=1)
     elseif(CMAKE_USE_WIN32_THREADS_INIT)
         # CMake doesn't support Win95 threads, Win32 threads are Vista
@@ -421,6 +422,11 @@ endif()
 
 if(ENABLE_CRC64)
     add_definitions(-DHAVE_CHECK_CRC64=1)
+endif()
+
+if(MINGW AND BUILD_STATIC)
+    # STATIC RUNTIME
+    set(CMAKE_CXX_FLAGS "-static -static-libgcc -static-libstdc++ ${CMAKE_CXX_FLAGS}")
 endif()
 
 # LIBRARIES

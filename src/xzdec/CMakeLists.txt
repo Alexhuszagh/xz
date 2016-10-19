@@ -23,8 +23,8 @@ set(XZDEC_SOURCES
 set(LZMADEC_SOURCES ${XZDEC_SOURCES})
 
 if(WIN32)
-    list(APPEND XZDEC_SOURCES xzdec_w32res.rc)
-    list(APPEND LZMADEC_SOURCES lzmadec_w32res.rc)
+    #list(APPEND XZDEC_SOURCES xzdec_w32res.rc)
+    #list(APPEND LZMADEC_SOURCES lzmadec_w32res.rc)
 endif()
 
 # EXECUTABLES

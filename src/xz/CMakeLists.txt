@@ -37,7 +37,7 @@ if(ENABLE_ENCODERS)
 endif()
 
 if(WIN32)
-    list(APPEND Xz_SOURCES xz_w32res.rc)
+    #list(APPEND Xz_SOURCES xz_w32res.rc)
 endif()
 
 # EXECUTABLE
