@@ -3,6 +3,7 @@
 
 cmake_minimum_required(VERSION 3.4)
 project(Xz C)
+set(C_STANDARD 99)
 
 # VERSION
 # -------
@@ -48,6 +49,9 @@ option(ENABLE_SPARC "Enable sparc filter" ON)
 set(ENABLE_ENCODERS ${ENABLE_LZMA1} OR ${ENABLE_LZMA2} OR ${ENABLE_DELTA} OR ${ENABLE_X86} OR ${ENABLE_POWERPC} OR ${ENABLE_IA64} OR ${ENABLE_ARM} OR ${ENABLE_ARMTHUMB} OR ${ENABLE_SPARC})
 set(ENABLE_DECODERS ${ENABLE_ENCODERS})
 
+set(ENABLE_LZ ${ENABLE_LZMA1})
+set(ENABLE_SIMPLE ${ENABLE_DELTA} OR ${ENABLE_X86} OR ${ENABLE_POWERPC} OR ${ENABLE_IA64} OR ${ENABLE_ARM} OR ${ENABLE_ARMTHUMB} OR ${ENABLE_SPARC})
+
 if(ENABLE_LZMA2 AND NOT ENABLE_LZMA1)
     message(FATAL_ERROR "Lzma2 requires that Lzma1 is also enabled.")
 endif()
@@ -73,6 +77,12 @@ endif()
 include(CheckIncludeFile)
 
 add_definitions(-DSTDC_HEADERS=1)
+
+CHECK_INCLUDE_FILE(stdbool.h STDBOOL_H)
+if(STDBOOL_H)
+    add_definitions(-DHAVE_STDBOOL_H=1)
+endif()
+
 CHECK_INCLUDE_FILE(sys/types.h SYS_TYPES_H)
 if(SYS_TYPES_H)
     add_definitions(-DHAVE_SYS_TYPES_H=1)
@@ -256,6 +266,13 @@ endif()
 CHECK_TYPE_SIZE(size_t SIZEOF_SIZE_T)
 add_definitions(-DSIZEOF_SIZE_T=${SIZEOF_SIZE_T})
 
+if(NOT STDBOOL_H)
+    CHECK_TYPE_SIZE(_Bool HAVE_BOOL)
+    if(HAVE_BOOL)
+        add_definitions(-DHAVE__BOOL=1)
+    endif()
+endif()
+
 # STRUCTS
 # -------
 
@@ -298,8 +315,22 @@ if(SYS_STAT_H)
     endif()
 endif()
 
-# P_THREAD
-#CHECK_INCLUDE_FILES("pthread.h" CMAKE_HAVE_PTHREAD_H)
+# THREADS
+# -------
+
+include(FindThreads)
+
+if(ENABLE_THREADS)
+    if(CMAKE_USE_PTHREADS_INIT)
+        add_definitions(-DMYTHREAD_POSIX=1)
+    elseif(CMAKE_USE_WIN32_THREADS_INIT)
+        # CMake doesn't support Win95 threads, Win32 threads are Vista
+        add_definitions(-DMYTHREAD_VISTA=1)
+    else()
+        message(WARNING "Threads requested but no suitable thread implementation found")
+        set(ENABLE_THREADS OFF)
+    endif()
+endif()
 
 # SYSTEM
 # ------
