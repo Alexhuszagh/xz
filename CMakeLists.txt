@@ -12,11 +12,13 @@ set(${PROJECT}_VERSION_MAJOR 5)
 set(${PROJECT}_VERSION_MINOR 3)
 set(${PROJECT}_VERSION_PATCH 0)
 
+set(PACKAGE_NAME "XZ Utils")
+set(PACKAGE_VERSION "5.3.0alpha")
 add_definitions(
-    -DPACKAGE_NAME="XZ Utils"
+    -DPACKAGE_NAME="${PACKAGE_NAME}"
     -DPACKAGE_STRING="XZ Utils 5.3.0alpha"
     -DPACKAGE_TARNAME="xz"
-    -DPACKAGE_VERSION="5.3.0alpha"
+    -DPACKAGE_VERSION="${PACKAGE_VERSION}"
     -DPACKAGE_URL="http://tukaani.org/xz/"
     -DPACKAGE_BUGREPORT="lasse.collin@tukaani.org"
 )
@@ -26,6 +28,7 @@ add_definitions(
 # ---------
 
 option(BUILD_STATIC "Build static liblzma" ON)
+option(BUILD_DOCUMENTATION "Build LZMA documentation" ON)
 option(BUILD_XZ "Build XZ compressor/decompressor" OFF)
 option(BUILD_LZMA_INFO "Build LZMA information" OFF)
 option(BUILD_SCRIPTS "Build LZMA scripts" OFF)
@@ -33,7 +36,6 @@ option(BUILD_SCRIPTS "Build LZMA scripts" OFF)
 # OPTIONS
 option(ENABLE_ASSSEMBLER "Enable optimized assembly instructions" ON)
 option(ENABLE_ASSUME_RAM "Enable RAM assumptions on systems without RAM detection" ON)
-option(ENABLE_DOC "Build LZMA documentation" ON)
 option(ENABLE_SCRIPTS "Build LZMA xzdiff, xzgrep, xzmore and xzless" ON)
 option(ENABLE_SMALL "Build small version of LZMA" OFF)
 option(ENABLE_SYMBOL_VERSIONS "Build LZMA with version symbols" ON)
@@ -424,3 +426,32 @@ set(XZ_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(XZ_LIB_DIR "${XZ_PROJECT_DIR}/lib")
 
 add_subdirectory(src)
+
+# DOCUMENTATION
+# -------------
+
+if(BUILD_DOCUMENTATION)
+    find_program(DOXYGEN doxygen)
+    if(NOT DOXYGEN)
+        message(WARNING "Doxygen must be installed to build documentation.")
+    else()
+        # read doxyfile
+        set(DOXYFILE "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
+        file(READ "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in" DOXYFILE)
+
+        # replace autotools strings
+        string(REPLACE "@PACKAGE_NAME@" "${PACKAGE_NAME}" DOXYFILE ${DOXYFILE})
+        string(REPLACE "@PACKAGE_VERSION@" "${PACKAGE_VERSION}" DOXYFILE ${DOXYFILE})
+        string(REPLACE "@top_srcdir@" "${CMAKE_CURRENT_SOURCE_DIR}" DOXYFILE ${DOXYFILE})
+
+        # write doxyfile
+        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile" ${DOXYFILE})
+
+        # add target
+        add_custom_target(doc
+            COMMAND ${DOXYGEN} ${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+            COMMENT "Generating API documentation with Doxygen"
+        )
+    endif()
+endif()
