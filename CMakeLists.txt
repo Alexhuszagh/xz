@@ -22,7 +22,6 @@ add_definitions(
     -DPACKAGE_URL="http://tukaani.org/xz/"
     -DPACKAGE_BUGREPORT="lasse.collin@tukaani.org"
 )
-#PACKAGE_URL
 
 # ARGUMENTS
 # ---------
@@ -32,6 +31,7 @@ option(BUILD_DOCUMENTATION "Build LZMA documentation" ON)
 option(BUILD_XZ "Build XZ compressor/decompressor" OFF)
 option(BUILD_LZMA_INFO "Build LZMA information" OFF)
 option(BUILD_SCRIPTS "Build LZMA scripts" OFF)
+option(BUILD_TESTS "Build LZMA tests" OFF)
 
 # OPTIONS
 option(ENABLE_ASSSEMBLER "Enable optimized assembly instructions" ON)
@@ -426,6 +426,13 @@ set(XZ_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 set(XZ_LIB_DIR "${XZ_PROJECT_DIR}/lib")
 
 add_subdirectory(src)
+
+# TESTS
+# -----
+
+if(BUILD_TESTS)
+    add_subdirectory(tests)
+endif()
 
 # DOCUMENTATION
 # -------------

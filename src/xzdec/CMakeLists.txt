@@ -1,10 +1,18 @@
 #  :copyright: (c) 2015-2016 The Regents of the University of California.
 #  :license: MIT, see licenses/mit.md for more details.
 
-# TODO: need to if/else this whole thing for LZMADEC, XZDEC
 
-# XZDEC
-# -----
+# INCLUDES
+# --------
+
+include_directories(
+    ${XZ_PROJECT_DIR}/src/common
+    ${XZ_PROJECT_DIR}/src/liblzma
+    ${XZ_PROJECT_DIR}/src/liblzma/api
+)
+
+# SOURCES
+# -------
 
 set(XZDEC_SOURCES
     xzdec.c
@@ -18,12 +26,6 @@ if(WIN32)
     list(APPEND XZDEC_SOURCES xzdec_w32res.rc)
     list(APPEND LZMADEC_SOURCES lzmadec_w32res.rc)
 endif()
-
-include_directories(
-    ${XZ_PROJECT_DIR}/src/common
-    ${XZ_PROJECT_DIR}/src/liblzma
-    ${XZ_PROJECT_DIR}/src/liblzma/api
-)
 
 # EXECUTABLES
 # -----------
