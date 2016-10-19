@@ -20,9 +20,9 @@ if(WIN32)
 endif()
 
 include_directories(
-    ${XZ_COMMON_DIR}
-    ${XZ_LIBLZMA_DIR}
-    ${XZ_API_DIR}
+    ${XZ_PROJECT_DIR}/src/common
+    ${XZ_PROJECT_DIR}/src/liblzma
+    ${XZ_PROJECT_DIR}/src/liblzma/api
 )
 
 # EXECUTABLES

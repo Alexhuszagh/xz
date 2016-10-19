@@ -10,13 +10,17 @@
 # TODO: need rangecoder/Makefile.inc
 # TODO: need delta/Makefile.inc
 # TODO: need simple/Makefile.inc
-
-# TODO: enabled all encoders and decoders by default.
-# TODO: need to check COND_MAIN_ENCODER
+# ENABLE_SYMBOL_VERSIONS
 
 include_directories(
-    check
-    common
+    ${XZ_PROJECT_DIR}/src/liblzma/api
+    ${XZ_PROJECT_DIR}/src/liblzma/common
+    ${XZ_PROJECT_DIR}/src/liblzma/check
+    ${XZ_PROJECT_DIR}/src/liblzma/lz
+    ${XZ_PROJECT_DIR}/src/liblzma/lzma
+    ${XZ_PROJECT_DIR}/src/liblzma/delta
+    ${XZ_PROJECT_DIR}/src/liblzma/simple
+    ${XZ_PROJECT_DIR}/src/common
 )
 
 set(LZMA_SOURCES
@@ -32,6 +36,8 @@ set(LZMA_SOURCES
     common/vli_size.c
 )
 
+# THREADING
+
 if(ENABLE_THREADS)
     list(APPEND LZMA_SOURCES
         ../common/tuklib_cpucores.c
@@ -40,6 +46,8 @@ if(ENABLE_THREADS)
         common/stream_encoder_mt.c
     )
 endif()
+
+# FILTERS
 
 if(ENABLE_ENCODERS)
     list(APPEND LZMA_SOURCES
@@ -81,6 +89,36 @@ if(ENABLE_DECODERS)
     )
 endif()
 
+if(ENABLE_LZMA1)
+endif()
+# COND_FILTER_LZ??
+
+if(ENABLE_LZMA2)
+endif()
+
+if(ENABLE_DELTA)
+endif()
+
+if(ENABLE_X86)
+endif()
+
+if(ENABLE_POWERPC)
+endif()
+
+if(ENABLE_IA64)
+endif()
+
+if(ENABLE_ARM)
+endif()
+
+if(ENABLE_ARMTHUMB)
+endif()
+
+if(ENABLE_SPARC)
+endif()
+
+# CHECKS
+
 if(ENABLE_CRC32)
     if(ENABLE_SMALL)
         list(APPEND LZMA_SOURCES check/crc32_small.c)
@@ -118,7 +156,13 @@ endif()
 
 if(WIN32 AND NOT BUILD_STATIC)
     # Add resource files only in shared builds
+    # Add in lzma.def
 endif()
+
+# FLAGS
+# -----
+
+add_definitions(-DTUKLIB_SYMBOL_PREFIX=lzma_)
 
 # LIBRARIES
 # ---------
@@ -137,4 +181,5 @@ endif()
 
 set_target_properties(LibLzma
     PROPERTIES OUTPUT_NAME lzma
+    LINK_FLAGS -no-undefined -version-info 8:99:3
 )
