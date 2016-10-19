@@ -28,10 +28,12 @@ add_definitions(
 
 option(BUILD_STATIC "Build static liblzma" ON)
 option(BUILD_DOCUMENTATION "Build LZMA documentation" ON)
-option(BUILD_XZ "Build XZ compressor/decompressor" OFF)
-option(BUILD_LZMA_INFO "Build LZMA information" OFF)
-option(BUILD_SCRIPTS "Build LZMA scripts" OFF)
-option(BUILD_TESTS "Build LZMA tests" OFF)
+if(UNIX)
+    option(BUILD_XZ "Build XZ compressor/decompressor" OFF)
+    option(BUILD_LZMA_INFO "Build LZMA information" OFF)
+    option(BUILD_SCRIPTS "Build LZMA scripts" OFF)
+    option(BUILD_TESTS "Build LZMA tests" OFF)
+endif()
 
 # OPTIONS
 option(ENABLE_ASSSEMBLER "Enable optimized assembly instructions" ON)
@@ -422,6 +424,51 @@ endif()
 
 if(ENABLE_CRC64)
     add_definitions(-DHAVE_CHECK_CRC64=1)
+endif()
+
+if(ENABLE_LZMA1)
+    add_definitions(-DHAVE_ENCODER_LZMA1=1)
+    add_definitions(-DHAVE_DECODER_LZMA1=1)
+endif()
+
+if(ENABLE_LZMA2)
+    add_definitions(-DHAVE_ENCODER_LZMA2=1)
+    add_definitions(-DHAVE_DECODER_LZMA2=1)
+endif()
+
+if(ENABLE_X86)
+    add_definitions(-DHAVE_ENCODER_X86=1)
+    add_definitions(-DHAVE_DECODER_X86=1)
+endif()
+
+if(ENABLE_POWERPC)
+    add_definitions(-DHAVE_ENCODER_POWERPC=1)
+    add_definitions(-DHAVE_DECODER_POWERPC=1)
+endif()
+
+if(ENABLE_IA64)
+    add_definitions(-DHAVE_ENCODER_IA64=1)
+    add_definitions(-DHAVE_DECODER_IA64=1)
+endif()
+
+if(ENABLE_ARM)
+    add_definitions(-DHAVE_ENCODER_ARM=1)
+    add_definitions(-DHAVE_DECODER_ARM=1)
+endif()
+
+if(ENABLE_ARMTHUMB)
+    add_definitions(-DHAVE_ENCODER_ARMTHUMB=1)
+    add_definitions(-DHAVE_DECODER_ARMTHUMB=1)
+endif()
+
+if(ENABLE_SPARC)
+    add_definitions(-DHAVE_ENCODER_SPARC=1)
+    add_definitions(-DHAVE_DECODER_SPARC=1)
+endif()
+
+if(ENABLE_DELTA)
+    add_definitions(-DHAVE_ENCODER_DELTA=1)
+    add_definitions(-DHAVE_DECODER_DELTA=1)
 endif()
 
 if(MINGW AND BUILD_STATIC)
