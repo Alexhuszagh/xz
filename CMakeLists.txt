@@ -8,6 +8,7 @@ set(C_STANDARD 99)
 # VERSION
 # -------
 
+# TODO: this should really use a cross-platform version of the sed script
 set(${PROJECT}_VERSION_MAJOR 5)
 set(${PROJECT}_VERSION_MINOR 3)
 set(${PROJECT}_VERSION_PATCH 0)
@@ -100,169 +101,110 @@ include(CheckIncludeFile)
 
 add_definitions(-DSTDC_HEADERS=1)
 
-CHECK_INCLUDE_FILE(stdbool.h STDBOOL_H)
-if(STDBOOL_H)
-    add_definitions(-DHAVE_STDBOOL_H=1)
-endif()
+# Check if header can be found. If it can, set uppercase variable
+# of version and define includes for the header.
+#
+# Args:
+#   header          Path to header
+#
+# Example:
+#   CheckIncludeFile(sys/stat.h)
+#
+macro(DefineIncludeHeader header)
+    string(REGEX REPLACE "[.\\/]" "_" headerName ${header})
+    string(TOUPPER ${headerName} headerName)
+    CHECK_INCLUDE_FILE(${header} ${headerName})
+    if(${headerName})
+        add_definitions(-DHAVE_${headerName}=1)
+    endif()
+endmacro(DefineIncludeHeader)
 
-CHECK_INCLUDE_FILE(sys/types.h SYS_TYPES_H)
-if(SYS_TYPES_H)
-    add_definitions(-DHAVE_SYS_TYPES_H=1)
-endif()
+# Call DefineIncludeHeader for each argument.
+#
+# Example:
+#   DefineIncludeHeaders(string.h stdio.h sys/stat.h)
+#
+macro(DefineIncludeHeaders)
+    set(headers ${ARGN})
+    foreach(header ${headers})
+        DefineIncludeHeader(${header})
+    endforeach(header)
+endmacro(DefineIncludeHeaders)
 
-CHECK_INCLUDE_FILE(sys/stat.h SYS_STAT_H)
-if(SYS_STAT_H)
-    add_definitions(-DHAVE_SYS_STAT_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(stdlib.h STDLIB_H)
-if(STDLIB_H)
-    add_definitions(-DHAVE_STDLIB_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(string.h STRING_H)
-if(STRING_H)
-    add_definitions(-DHAVE_STRING_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(memory.h MEMORY_H)
-if(MEMORY_H)
-    add_definitions(-DHAVE_MEMORY_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(strings.h STRINGS_H)
-if(STRINGS_H)
-    add_definitions(-DHAVE_STRINGS_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(inttypes.h INTTYPES_H)
-if(INTTYPES_H)
-    add_definitions(-DHAVE_INTTYPES_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(stdint.h STDINT_H)
-if(STDINT_H)
-    add_definitions(-DHAVE_STDINT_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(unistd.h UNISTD_H)
-if(UNISTD_H)
-    add_definitions(-DHAVE_UNISTD_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(fcntl.h FCNTL_H)
-if(FCNTL_H)
-    add_definitions(-DHAVE_FCNTL_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(limits.h LIMITS_H)
-if(LIMITS_H)
-    add_definitions(-DHAVE_LIMITS_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(sys/time.h SYS_TIME_H)
-if(SYS_TIME_H)
-    add_definitions(-DHAVE_SYS_TIME_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(immintrin.h IMMINTRIN_H)
-if(IMMINTRIN_H)
-    add_definitions(-DHAVE_IMMINTRIN_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(immintrin.h IMMINTRIN_H)
-if(IMMINTRIN_H)
-    add_definitions(-DHAVE_IMMINTRIN_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(CommonCrypto/CommonDigest.h COMMONCRYPTO_COMMONDIGEST_H)
-if(COMMONCRYPTO_COMMONDIGEST_H)
-    add_definitions(-DHAVE_COMMONCRYPTO_COMMONDIGEST_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(sha256.h SHA256_H)
-if(SHA256_H)
-    add_definitions(-DHAVE_SHA256_H=1)
-endif()
-
-CHECK_INCLUDE_FILE(sha2.h SHA2_H)
-if(SHA2_H)
-    add_definitions(-DHAVE_SHA2_H=1)
-endif()
+DefineIncludeHeaders(
+    stdbool.h
+    sys/types.h
+    sys/stat.h
+    stdlib.h
+    string.h
+    memory.h
+    strings.h
+    inttypes.h
+    stdint.h
+    unistd.h
+    fcntl.h
+    limits.h
+    sys/time.h
+    immintrin.h
+    CommonCrypto/CommonDigest.h
+    sha256.h
+    sha2.h
+)
 
 # FUNCTIONS
 # ---------
 
 include(CheckFunctionExists)
 
-CHECK_FUNCTION_EXISTS(clock_gettime CLOCK_GETTIME)
-if(CLOCK_GETTIME)
-    add_definitions(-DHAVE_CLOCK_GETTIME=1)
-endif()
+# Check if function exists, and add definition if it does.
+#
+# Args:
+#   function        Function name
+#
+# Example:
+#   CheckIncludeFile(clock_gettime)
+#
+macro(DefineFunctionExists function)
+    string(TOUPPER ${function} functionName)
+    CHECK_FUNCTION_EXISTS(${function} ${functionName})
+    if(${functionName})
+        add_definitions(-DHAVE_${functionName}=1)
+    endif()
+endmacro(DefineFunctionExists)
 
-CHECK_FUNCTION_EXISTS(pthread_condattr_setclock PTHREAD_CONDATTR_SETCLOCK)
-if(PTHREAD_CONDATTR_SETCLOCK)
-    add_definitions(-DHAVE_PTHREAD_CONDATTR_SETCLOCK=1)
-endif()
+
+# Call DefineFunctionExists for each argument.
+#
+# Example:
+#   DefineFunctionsExist(strdup strndup strerror)
+#
+macro(DefineFunctionsExist)
+    set(functions ${ARGN})
+    foreach(function ${functions})
+        DefineFunctionExists(${function})
+    endforeach(function)
+endmacro(DefineFunctionsExist)
+
+
+DefineFunctionsExist(
+    clock_gettime
+    pthread_condattr_setclock
+    futimens
+    futimes
+    futimesat
+    utimes
+    _futime
+    utime
+    posix_fadvise
+    CC_SHA256_Init
+    SHA256Init
+    SHA256_Init
+    _mm_movemask_epi8
+)
 
 CHECK_FUNCTION_EXISTS(CLOCK_MONOTONIC DECL_CLOCK_MONOTONIC)
 if(DECL_CLOCK_MONOTONIC)
     add_definitions(-DHAVE_DECL_CLOCK_MONOTONIC=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(futimens FUTIMENS)
-if(FUTIMENS)
-    add_definitions(-DHAVE_FUTIMENS=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(futimes FUTIMES)
-if(FUTIMES)
-    add_definitions(-DHAVE_FUTIMES=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(futimesat FUTIMESAT)
-if(FUTIMESAT)
-    add_definitions(-DHAVE_FUTIMESAT=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(utimes UTIMES)
-if(UTIMES)
-    add_definitions(-DHAVE_UTIMES=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(_futime FUTIME)
-if(FUTIME)
-    add_definitions(-DHAVE__FUTIME=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(utime UTIME)
-if(UTIME)
-    add_definitions(-DHAVE_UTIME=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(posix_fadvise POSIX_FADVISE)
-if(POSIX_FADVISE)
-    add_definitions(-DHAVE_POSIX_FADVISE=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(CC_SHA256_Init CC_SHA256_INIT)
-if(CC_SHA256_INIT)
-    add_definitions(-DHAVE_CC_SHA256_INIT=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(SHA256Init SHA256INIT)
-if(SHA256INIT)
-    add_definitions(-DHAVE_SHA256INIT=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(SHA256_Init SHA256_INIT)
-if(SHA256_INIT)
-    add_definitions(-DHAVE_SHA256_INIT=1)
-endif()
-
-CHECK_FUNCTION_EXISTS(_mm_movemask_epi8 MM_MOVEMASK_EPI8)
-if(MM_MOVEMASK_EPI8)
-    add_definitions(-DHAVE__MM_MOVEMASK_EPI8=1)
 endif()
 
 # LITERALS
@@ -300,41 +242,37 @@ endif()
 
 include(CheckStructHasMember)
 
+# Check if struct has member, and add preprocessor definition if it does.
+#
+# Args:
+#   struct              Struct name
+#   member              Member name (can include members of members)
+#   header              Header struct is defined in
+#
+# Example:
+#   DefineStructHasMember(stat st_atim.tv_nsec sys/stat.h)
+#
+macro(DefineStructHasMember struct member header)
+    # make suitable struct member name
+    string(REGEX REPLACE "[.\\/]" "_" structMemberName ${member})
+    set(structMemberName struct_${struct}_${structMemberName})
+    string(TOUPPER ${structMemberName} structMemberName)
+
+    CHECK_STRUCT_HAS_MEMBER("struct ${struct}" ${member} ${header} ${structMemberName}
+        LANGUAGE C
+    )
+    if(${structMemberName})
+        add_definitions(-DHAVE_${structMemberName}=1)
+    endif()
+endmacro(DefineStructHasMember)
+
+
 if(SYS_STAT_H)
-    CHECK_STRUCT_HAS_MEMBER("struct stat" st_atim.tv_nsec sys/stat.h STRUCT_STAT_ST_ATIM_TV_NSEC
-        LANGUAGE C
-    )
-    if (STRUCT_STAT_ST_ATIM_TV_NSEC)
-        add_definitions(-DHAVE_STRUCT_STAT_ST_ATIM_TV_NSEC=1)
-    endif()
-
-    CHECK_STRUCT_HAS_MEMBER("struct stat" st_atimespec.tv_nsec sys/stat.h STRUCT_STAT_ST_ATIMESPEC_TV_NSEC
-        LANGUAGE C
-    )
-    if (STRUCT_STAT_ST_ATIMESPEC_TV_NSEC)
-        add_definitions(-DHAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC=1)
-    endif()
-
-    CHECK_STRUCT_HAS_MEMBER("struct stat" st_atimensec sys/stat.h STRUCT_STAT_ST_ATIMENSEC
-        LANGUAGE C
-    )
-    if (STRUCT_STAT_ST_ATIMENSEC)
-        add_definitions(-DHAVE_STRUCT_STAT_ST_ATIMENSEC=1)
-    endif()
-
-    CHECK_STRUCT_HAS_MEMBER("struct stat" st_uatime sys/stat.h STRUCT_STAT_ST_UATIME
-        LANGUAGE C
-    )
-    if (STRUCT_STAT_ST_UATIME)
-        add_definitions(-DHAVE_STRUCT_STAT_ST_UATIME=1)
-    endif()
-
-    CHECK_STRUCT_HAS_MEMBER("struct stat" st_atim.st__tim.tv_nsec sys/stat.h STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC
-        LANGUAGE C
-    )
-    if (STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC)
-        add_definitions(-DHAVE_STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC=1)
-    endif()
+    DefineStructHasMember(stat st_atim.tv_nsec sys/stat.h)
+    DefineStructHasMember(stat st_atimespec.tv_nsec sys/stat.h)
+    DefineStructHasMember(stat st_atimensec sys/stat.h)
+    DefineStructHasMember(stat st_uatime sys/stat.h)
+    DefineStructHasMember(stat st_atim.st__tim.tv_nsec sys/stat.h)
 endif()
 
 # THREADS
