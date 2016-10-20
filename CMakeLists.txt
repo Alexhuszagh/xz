@@ -2,22 +2,55 @@
 #  :license: MIT, see licenses/mit.md for more details.
 
 cmake_minimum_required(VERSION 3.4)
-project(Xz C)
+project(XzUtils C)
 set(C_STANDARD 99)
 
 # VERSION
 # -------
 
-# TODO: this should really use a cross-platform version of the sed script
-set(${PROJECT}_VERSION_MAJOR 5)
-set(${PROJECT}_VERSION_MINOR 3)
-set(${PROJECT}_VERSION_PATCH 0)
+# Extract number from regex. Useful because CMake's regex support
+# is poor.
+#
+# Args:
+#   pattern             Regular expression pattern with group
+#   input               Input data name
+#   output              Output variable name
+#
+macro(RegexExtractNumber pattern input output)
+    STRING(REGEX MATCH ${pattern} ${output} ${${input}})
+    STRING(REGEX MATCH "[0-9]+" ${output} ${${output}})
+endmacro(RegexExtractNumber)
+
+set(VERSION_FILE src/liblzma/api/lzma/version.h)
+file(READ "${VERSION_FILE}" VERSION_INFO)
+
+# SEMANTIC
+RegexExtractNumber("LZMA_VERSION_MAJOR [0-9]+" VERSION_INFO XzUtils_VERSION_MAJOR)
+RegexExtractNumber("LZMA_VERSION_MINOR [0-9]+" VERSION_INFO XzUtils_VERSION_MINOR)
+RegexExtractNumber("LZMA_VERSION_PATCH [0-9]+" VERSION_INFO XzUtils_VERSION_PATCH)
+
+# STABILITY
+set(HEADER "LZMA_VERSION_STABILITY LZMA_VERSION_STABILITY_")
+string(LENGTH ${HEADER} HEADER_LENGTH)
+
+STRING(REGEX MATCH
+    "${HEADER}[A-Z]+"
+    XzUtils_STABILITY
+    ${VERSION_INFO}
+)
+
+string(SUBSTRING ${XzUtils_STABILITY} ${HEADER_LENGTH} -1 XzUtils_STABILITY)
+string(TOLOWER ${XzUtils_STABILITY} XzUtils_STABILITY)
+
+# PACKAGE DATA
+set(XzUtils_VERSION "${XzUtils_VERSION_MAJOR}.${XzUtils_VERSION_MINOR}.${XzUtils_VERSION_PATCH}")
+set(XzUtils_FULL_VERSION "${XzUtils_VERSION}${XzUtils_STABILITY}")
 
 set(PACKAGE_NAME "XZ Utils")
-set(PACKAGE_VERSION "5.3.0alpha")
+set(PACKAGE_VERSION "${XzUtils_FULL_VERSION}")
 add_definitions(
     -DPACKAGE_NAME="${PACKAGE_NAME}"
-    -DPACKAGE_STRING="XZ Utils 5.3.0alpha"
+    -DPACKAGE_STRING="XZ Utils ${XzUtils_FULL_VERSION}"
     -DPACKAGE_TARNAME="xz"
     -DPACKAGE_VERSION="${PACKAGE_VERSION}"
     -DPACKAGE_URL="http://tukaani.org/xz/"
@@ -438,8 +471,8 @@ if(BUILD_DOCUMENTATION)
         message(WARNING "Doxygen must be installed to build documentation.")
     else()
         # read doxyfile
-        set(DOXYFILE "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile")
-        file(READ "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in" DOXYFILE)
+        set(DOXY_SOURCE "${CMAKE_CURRENT_SOURCE_DIR}")
+        file(READ "${DOXY_SOURCE}/Doxyfile.in" DOXYFILE)
 
         # replace autotools strings
         string(REPLACE "@PACKAGE_NAME@" "${PACKAGE_NAME}" DOXYFILE ${DOXYFILE})
@@ -447,7 +480,7 @@ if(BUILD_DOCUMENTATION)
         string(REPLACE "@top_srcdir@" "${CMAKE_CURRENT_SOURCE_DIR}" DOXYFILE ${DOXYFILE})
 
         # write doxyfile
-        file(WRITE "${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile" ${DOXYFILE})
+        file(WRITE "${DOXY_SOURCE}/Doxyfile" ${DOXYFILE})
 
         # add target
         add_custom_target(doc
