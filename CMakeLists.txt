@@ -8,26 +8,12 @@ set(C_STANDARD 99)
 # VERSION
 # -------
 
-# Extract number from regex. Useful because CMake's regex support
-# is poor.
-#
-# Args:
-#   pattern             Regular expression pattern with group
-#   input               Input data name
-#   output              Output variable name
-#
-macro(RegexExtractNumber pattern input output)
-    STRING(REGEX MATCH ${pattern} ${output} ${${input}})
-    STRING(REGEX MATCH "[0-9]+" ${output} ${${output}})
-endmacro(RegexExtractNumber)
-
 set(VERSION_FILE src/liblzma/api/lzma/version.h)
-file(READ "${VERSION_FILE}" VERSION_INFO)
+file(STRINGS "${VERSION_FILE}" XzUtils_HEADER_CONTENTS REGEX "#define LZMA_VERSION_[A-Z]+ [0-9]+")
 
-# SEMANTIC
-RegexExtractNumber("LZMA_VERSION_MAJOR [0-9]+" VERSION_INFO XzUtils_VERSION_MAJOR)
-RegexExtractNumber("LZMA_VERSION_MINOR [0-9]+" VERSION_INFO XzUtils_VERSION_MINOR)
-RegexExtractNumber("LZMA_VERSION_PATCH [0-9]+" VERSION_INFO XzUtils_VERSION_PATCH)
+string(REGEX REPLACE ".*#define LZMA_VERSION_MAJOR ([0-9]+).*" "\\1" Xz_VERSION_MAJOR "${XzUtils_HEADER_CONTENTS}")
+string(REGEX REPLACE ".*#define LZMA_VERSION_MINOR ([0-9]+).*" "\\1" Xz_VERSION_MINOR "${XzUtils_HEADER_CONTENTS}")
+string(REGEX REPLACE ".*#define LZMA_VERSION_PATCH ([0-9]+).*" "\\1" Xz_VERSION_PATCH "${XzUtils_HEADER_CONTENTS}")
 
 # STABILITY
 set(HEADER "LZMA_VERSION_STABILITY LZMA_VERSION_STABILITY_")
