@@ -235,6 +235,8 @@ endif()
 CHECK_TYPE_SIZE(SHA2_CTX SHA2_CTX)
 if(SHA2_CTX)
     add_definitions(-DHAVE_SHA2_CTX=1)
+else()
+    add_definitions(-DHAVE_INTERNAL_SHA256=1)
 endif()
 
 CHECK_TYPE_SIZE(size_t SIZEOF_SIZE_T)
