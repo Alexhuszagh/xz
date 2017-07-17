@@ -241,8 +241,6 @@ elseif(SHA2_CTX)
     add_definitions(-DHAVE_SHA2_CTX=1)
 elseif(SHA256_CTX)
     add_definitions(-DHAVE_SHA256_CTX=1)
-else()
-    message(FATAL_ERROR "Unknown build system, no known Sha256 library")
 endif()
 
 CHECK_TYPE_SIZE(size_t SIZEOF_SIZE_T)
