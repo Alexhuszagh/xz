@@ -1,7 +1,7 @@
 #  :copyright: (c) 2015-2016 The Regents of the University of California.
 #  :license: MIT, see licenses/mit.md for more details.
 
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 2.8)
 project(XzUtils C)
 set(C_STANDARD 99)
 
