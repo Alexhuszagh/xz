@@ -233,10 +233,16 @@ if(NOT UINT8_T OR NOT UINT16_T OR NOT UINT32_T OR NOT UINT64_T OR NOT UINTPTR_T)
 endif()
 
 CHECK_TYPE_SIZE(SHA2_CTX SHA2_CTX)
-if(SHA2_CTX)
+CHECK_TYPE_SIZE(SHA256_CTX SHA256_CTX)
+
+if(APPLE)
+    add_definitions(-DHAVE_CC_SHA256_CTX=1)
+elseif(SHA2_CTX)
     add_definitions(-DHAVE_SHA2_CTX=1)
+elseif(SHA256_CTX)
+    add_definitions(-DHAVE_SHA256_CTX=1)
 else()
-    add_definitions(-DHAVE_INTERNAL_SHA256=1)
+    message(FATAL_ERROR "Unknown build system, no known Sha256 library")
 endif()
 
 CHECK_TYPE_SIZE(size_t SIZEOF_SIZE_T)
