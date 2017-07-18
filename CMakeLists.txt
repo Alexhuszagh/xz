@@ -104,6 +104,20 @@ if(ENABLE_LZMA1 AND NOT ENABLE_MATCH_FINDERS)
     message(FATAL_ERROR "You must enable at least one match filter with the Lzma filters.")
 endif()
 
+if(BUILD_STATIC)
+    if(UNIX)
+        set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+        add_definitions(-fPIC)
+    elseif(MINGW)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static")
+    elseif(MSVC)
+        set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /MTd /O0 /Fd${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /MT /Ox /Zi /Fd${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb")
+        set(CMAKE_CXX_FLAGS_MINSIZEREL "${CMAKE_CXX_FLAGS_MINSIZEREL} /MT /Zi /Fd${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb")
+        set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MT /Fd${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb")
+    endif()
+endif()
+
 # HEADERS
 # -------
 
