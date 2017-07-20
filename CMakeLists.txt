@@ -54,6 +54,10 @@ option(ENABLE_SMALL "Build small version of LZMA" OFF)
 option(ENABLE_SYMBOL_VERSIONS "Build LZMA with version symbols" ON)
 option(ENABLE_THREADS "Build LZMA with threading support" ON)
 
+if (MSVC)
+    set(ENABLE_ASSSEMBLER OFF)
+endif()
+
 if(ENABLE_ASSSEMBLER)
     enable_language(ASM)
 endif()
