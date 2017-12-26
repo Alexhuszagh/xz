@@ -5,7 +5,9 @@ cmake_minimum_required(VERSION 2.8)
 project(XzUtils C)
 set(C_STANDARD 99)
 enable_testing()
-cmake_policy(SET CMP0053 OLD)       # TODO: modernize
+if(${CMAKE_VERSION} VERSION_GREATER "3.1.0")
+    cmake_policy(SET CMP0053 OLD)
+endif()
 
 # VERSION
 # -------
