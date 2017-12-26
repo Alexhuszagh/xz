@@ -39,8 +39,7 @@ add_definitions(
 # ARGUMENTS
 # ---------
 
-option(BUILD_STATIC "Build static liblzma" ON)
-option(BUILD_DOCUMENTATION "Build LZMA documentation" ON)
+option(BUILD_DOCUMENTATION "Build LZMA documentation" OFF)
 if(UNIX)
     option(BUILD_XZ "Build XZ compressor/decompressor" OFF)
     option(BUILD_LZMA_INFO "Build LZMA information" OFF)
@@ -122,7 +121,7 @@ elseif(MSVC)
     set(CMAKE_C_FLAGS_RELWITHDEBINFO "${CMAKE_C_FLAGS_RELWITHDEBINFO} /MT /Fd${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb")
 endif()
 
-if(BUILD_STATIC)
+if(NOT BUILD_SHARED_LIBS)
     if(MINGW OR MSYS OR CYGWIN)
         set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -static")
     elseif(UNIX)
