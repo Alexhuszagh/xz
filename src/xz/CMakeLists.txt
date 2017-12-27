@@ -63,6 +63,6 @@ endif()
 # FLAGS
 # -----
 
-if(BUILD_STATIC)
+if(NOT BUILD_SHARED_LIBS)
     add_definitions(-DLZMA_API_STATIC)
 endif()

@@ -215,17 +215,9 @@ add_definitions(-DTUKLIB_SYMBOL_PREFIX=lzma_)
 # LIBRARIES
 # ---------
 
-if(BUILD_STATIC)
-    add_library(LibLzma
-        STATIC
-        ${LZMA_SOURCES}
-    )
-else()
-    add_library(LibLzma
-        SHARED
-        ${LZMA_SOURCES}
-    )
-endif()
+add_library(LibLzma
+    ${LZMA_SOURCES}
+)
 
 set_target_properties(LibLzma
     PROPERTIES OUTPUT_NAME lzma

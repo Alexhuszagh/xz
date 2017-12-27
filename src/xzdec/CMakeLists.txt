@@ -52,7 +52,7 @@ target_link_libraries(LzmaDec LibLzma)
 target_compile_definitions(XzDec PUBLIC -DTUKLIB_GETTEXT=0)
 target_compile_definitions(LzmaDec PUBLIC -DLZMADEC)
 
-if(BUILD_STATIC)
+if(NOT BUILD_SHARED_LIBS)
     add_definitions(-DLZMA_API_STATIC)
 endif()
 
